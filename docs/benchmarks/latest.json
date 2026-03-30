@@ -1,0 +1,93 @@
+{
+  "generatedAt": "2026-03-30T19:18:45.580Z",
+  "startedAt": "2026-03-30T19:18:43.990Z",
+  "finishedAt": "2026-03-30T19:18:45.580Z",
+  "config": {
+    "concurrency": 1,
+    "useGemini": false,
+    "skipVersionLookup": true,
+    "maxDepChecks": 0,
+    "dataset": "scripts/repo-benchmark-dataset.json",
+    "selectedCount": 1
+  },
+  "totals": {
+    "total": 1,
+    "pass": 1,
+    "partial": 0,
+    "fail": 0,
+    "llmUsedRepos": 0,
+    "totalFallbackTokens": 0,
+    "totalFallbackCostUSD": 0
+  },
+  "repos": [
+    {
+      "repo": "BicaMarius/CoalesceCode",
+      "url": "https://github.com/BicaMarius/CoalesceCode",
+      "status": "pass",
+      "requiredScore": "2/2",
+      "durationMs": 1589,
+      "detectedCore": {
+        "frontend": "React Client",
+        "backend": "Node.js Service",
+        "database": null
+      },
+      "llmUsed": false,
+      "fallbackReason": "Missing core components: database",
+      "fallbackChanges": [],
+      "fallbackTokens": 0,
+      "fallbackCostUSD": 0,
+      "categories": {
+        "frontend": {
+          "status": "pass",
+          "required": true,
+          "detected": true,
+          "matchesExpected": true,
+          "detectedSignals": [
+            "react client",
+            "react"
+          ],
+          "expectedKeywords": [
+            "react"
+          ]
+        },
+        "backend": {
+          "status": "pass",
+          "required": true,
+          "detected": true,
+          "matchesExpected": true,
+          "detectedSignals": [
+            "node.js service",
+            "node"
+          ],
+          "expectedKeywords": [
+            "node",
+            "api"
+          ]
+        },
+        "database": {
+          "status": "skip",
+          "required": false,
+          "detected": false,
+          "matchesExpected": false,
+          "detectedSignals": [],
+          "expectedKeywords": []
+        },
+        "services": {
+          "status": "pass",
+          "required": false,
+          "detected": true,
+          "matchesExpected": true,
+          "detectedSignals": [
+            "ai",
+            "gemini api",
+            "google"
+          ],
+          "expectedKeywords": [
+            "gemini"
+          ]
+        }
+      },
+      "error": null
+    }
+  ]
+}

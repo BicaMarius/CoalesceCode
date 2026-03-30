@@ -1,0 +1,287 @@
+{
+  "generatedAt": "2026-03-29T18:18:00.405Z",
+  "branch": "main",
+  "commit": "135c879",
+  "summary": {
+    "date": "2026-03-29",
+    "total": 30,
+    "pass": 28,
+    "partial": 2,
+    "fail": 0,
+    "corePassRate": 0.9333333333333333,
+    "holdoutPassRate": 0.8666666666666667,
+    "fallbackRate": 0
+  },
+  "rows": [
+    {
+      "id": "train-nextjs-core",
+      "split": "train",
+      "result": "PASS",
+      "missingOrIncorrect": "",
+      "fallbackUsed": "No",
+      "notes": "detected=frontend:Next.js, backend:Express API, database:PostgreSQL; missing-signals=next,externalApi",
+      "llmUsed": false
+    },
+    {
+      "id": "train-remix-core",
+      "split": "train",
+      "result": "PASS",
+      "missingOrIncorrect": "",
+      "fallbackUsed": "No",
+      "notes": "detected=frontend:Remix, database:PostgreSQL, backend:Node.js Server",
+      "llmUsed": false
+    },
+    {
+      "id": "train-nuxt-core",
+      "split": "train",
+      "result": "PASS",
+      "missingOrIncorrect": "",
+      "fallbackUsed": "No",
+      "notes": "detected=frontend:Nuxt.js, backend:Nitro Server",
+      "llmUsed": false
+    },
+    {
+      "id": "train-sveltekit-core",
+      "split": "train",
+      "result": "PASS",
+      "missingOrIncorrect": "",
+      "fallbackUsed": "No",
+      "notes": "detected=frontend:SvelteKit, backend:SvelteKit Endpoints",
+      "llmUsed": false
+    },
+    {
+      "id": "train-nest-backend",
+      "split": "train",
+      "result": "PASS",
+      "missingOrIncorrect": "",
+      "fallbackUsed": "No",
+      "notes": "detected=backend:Express API, database:MongoDB",
+      "llmUsed": false
+    },
+    {
+      "id": "train-express-backend",
+      "split": "train",
+      "result": "PASS",
+      "missingOrIncorrect": "",
+      "fallbackUsed": "No",
+      "notes": "detected=backend:Express API; missing-signals=externalApi",
+      "llmUsed": false
+    },
+    {
+      "id": "train-strapi-stack",
+      "split": "train",
+      "result": "PASS",
+      "missingOrIncorrect": "",
+      "fallbackUsed": "No",
+      "notes": "detected=backend:Koa API, database:PostgreSQL",
+      "llmUsed": false
+    },
+    {
+      "id": "train-directus-stack",
+      "split": "train",
+      "result": "PASS",
+      "missingOrIncorrect": "",
+      "fallbackUsed": "No",
+      "notes": "detected=database:PostgreSQL, backend:Node.js Server; missing-signals=cache",
+      "llmUsed": false
+    },
+    {
+      "id": "train-supabase-platform",
+      "split": "train",
+      "result": "PASS",
+      "missingOrIncorrect": "",
+      "fallbackUsed": "No",
+      "notes": "detected=frontend:Next.js, backend:Python Service, database:Supabase; missing-signals=auth,storage",
+      "llmUsed": false
+    },
+    {
+      "id": "train-fastapi-template",
+      "split": "train",
+      "result": "PASS",
+      "missingOrIncorrect": "",
+      "fallbackUsed": "No",
+      "notes": "detected=frontend:React Client, backend:Python Service; missing-signals=database",
+      "llmUsed": false
+    },
+    {
+      "id": "train-kevin-registration",
+      "split": "train",
+      "result": "PASS",
+      "missingOrIncorrect": "",
+      "fallbackUsed": "No",
+      "notes": "detected=frontend:React Client, backend:Express API, database:SQLite",
+      "llmUsed": false
+    },
+    {
+      "id": "train-django-core",
+      "split": "train",
+      "result": "PASS",
+      "missingOrIncorrect": "",
+      "fallbackUsed": "No",
+      "notes": "detected=backend:Python Service, database:PostgreSQL",
+      "llmUsed": false
+    },
+    {
+      "id": "train-fastapi-core",
+      "split": "train",
+      "result": "PASS",
+      "missingOrIncorrect": "",
+      "fallbackUsed": "No",
+      "notes": "detected=backend:Python Service",
+      "llmUsed": false
+    },
+    {
+      "id": "train-gin-core",
+      "split": "train",
+      "result": "PASS",
+      "missingOrIncorrect": "",
+      "fallbackUsed": "No",
+      "notes": "detected=backend:Go Service",
+      "llmUsed": false
+    },
+    {
+      "id": "train-symfony-core",
+      "split": "train",
+      "result": "PASS",
+      "missingOrIncorrect": "",
+      "fallbackUsed": "No",
+      "notes": "detected=backend:PHP Service, database:PostgreSQL",
+      "llmUsed": false
+    },
+    {
+      "id": "test-calcom",
+      "split": "test",
+      "result": "PASS",
+      "missingOrIncorrect": "",
+      "fallbackUsed": "No",
+      "notes": "detected=frontend:Next.js, backend:API Routes, database:PostgreSQL",
+      "llmUsed": false
+    },
+    {
+      "id": "test-payloadcms",
+      "split": "test",
+      "result": "PASS",
+      "missingOrIncorrect": "",
+      "fallbackUsed": "No",
+      "notes": "detected=frontend:Next.js, backend:API Routes, database:MongoDB",
+      "llmUsed": false
+    },
+    {
+      "id": "test-appsmith",
+      "split": "test",
+      "result": "PARTIAL",
+      "missingOrIncorrect": "backend: expected Node.js Server, got Java Service",
+      "fallbackUsed": "No",
+      "notes": "detected=frontend:React Client, backend:Java Service, database:MongoDB",
+      "llmUsed": false
+    },
+    {
+      "id": "test-mattermost",
+      "split": "test",
+      "result": "PASS",
+      "missingOrIncorrect": "",
+      "fallbackUsed": "No",
+      "notes": "detected=frontend:React Client, backend:Go Service, database:PostgreSQL",
+      "llmUsed": false
+    },
+    {
+      "id": "test-laravel",
+      "split": "test",
+      "result": "PASS",
+      "missingOrIncorrect": "",
+      "fallbackUsed": "No",
+      "notes": "detected=backend:PHP Service; missing-signals=database,externalApi",
+      "llmUsed": false
+    },
+    {
+      "id": "test-aspnetcore",
+      "split": "test",
+      "result": "PARTIAL",
+      "missingOrIncorrect": "backend: expected .NET Service, got Java Service",
+      "fallbackUsed": "No",
+      "notes": "detected=backend:Java Service; missing-signals=externalApi",
+      "llmUsed": false
+    },
+    {
+      "id": "test-spring-petclinic",
+      "split": "test",
+      "result": "PASS",
+      "missingOrIncorrect": "",
+      "fallbackUsed": "No",
+      "notes": "detected=backend:Java Service, database:PostgreSQL; missing-signals=externalApi",
+      "llmUsed": false
+    },
+    {
+      "id": "test-hasura",
+      "split": "test",
+      "result": "PASS",
+      "missingOrIncorrect": "",
+      "fallbackUsed": "No",
+      "notes": "detected=frontend:React Client, backend:Go Service, database:PostgreSQL; missing-signals=externalApi",
+      "llmUsed": false
+    },
+    {
+      "id": "test-grafana",
+      "split": "test",
+      "result": "PASS",
+      "missingOrIncorrect": "",
+      "fallbackUsed": "No",
+      "notes": "detected=frontend:React Client, backend:Go Service, database:PostgreSQL; missing-signals=monitoring",
+      "llmUsed": false
+    },
+    {
+      "id": "test-open-webui",
+      "split": "test",
+      "result": "PASS",
+      "missingOrIncorrect": "",
+      "fallbackUsed": "No",
+      "notes": "detected=frontend:SvelteKit, backend:Python Service; missing-signals=database,ai",
+      "llmUsed": false
+    },
+    {
+      "id": "test-dotnet-runtime",
+      "split": "test",
+      "result": "PASS",
+      "missingOrIncorrect": "",
+      "fallbackUsed": "No",
+      "notes": "detected=backend:.NET Service; tree-truncated",
+      "llmUsed": false
+    },
+    {
+      "id": "test-flask-core",
+      "split": "test",
+      "result": "PASS",
+      "missingOrIncorrect": "",
+      "fallbackUsed": "No",
+      "notes": "detected=backend:Python Service",
+      "llmUsed": false
+    },
+    {
+      "id": "test-kratos-go",
+      "split": "test",
+      "result": "PASS",
+      "missingOrIncorrect": "",
+      "fallbackUsed": "No",
+      "notes": "detected=backend:Go Service",
+      "llmUsed": false
+    },
+    {
+      "id": "test-laravel-framework",
+      "split": "test",
+      "result": "PASS",
+      "missingOrIncorrect": "",
+      "fallbackUsed": "No",
+      "notes": "detected=backend:PHP Service, database:PostgreSQL",
+      "llmUsed": false
+    },
+    {
+      "id": "test-spring-framework",
+      "split": "test",
+      "result": "PASS",
+      "missingOrIncorrect": "",
+      "fallbackUsed": "No",
+      "notes": "detected=backend:Java Service, database:PostgreSQL",
+      "llmUsed": false
+    }
+  ]
+}

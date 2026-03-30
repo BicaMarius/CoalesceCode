@@ -1,0 +1,31 @@
+{
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.inlineSuggest.enabled": true,
+
+  "github.copilot.enable": {
+    "*": true,
+    "markdown": true,
+    "plaintext": false
+  },
+  "github.copilot.editor.enableAutoCompletions": true,
+  "github.copilot.chat.agent.thinkingTool": true,
+  "github.copilot.nextEditSuggestions.enabled": true,
+
+  "chat.agent.maxRequests": 100,
+
+  "explorer.fileNesting.enabled": true,
+  "explorer.fileNesting.patterns": {
+    "CLAUDE.md": "SPEC.md, ARCHITECTURE.md, DECISIONS.md, SESSION_LOG.md, KNOWN_ISSUES.md, LESSONS_LEARNED.md, IMPROVEMENTS.md, TESTING.md, UI_UX.md, BUSINESS_LOGIC.md, EXTERNAL_SERVICES.md, AI_CHANGELOG.md, WORKFLOW.md",
+    "BLUEPRINT_01_KICKOFF.md": "BLUEPRINT_02_PUSH_DOC.md, BLUEPRINT_03_MVP_LAUNCH.md, BLUEPRINT_README.md, PROMPT_AUTOCOMPLETARE.md"
+  },
+
+  "markdown.preview.breaks": true,
+  "[markdown]": {
+    "editor.wordWrap": "on",
+    "editor.quickSuggestions": { "other": "off" }
+  },
+
+  "git.confirmSync": false,
+  "git.autofetch": true
+}
