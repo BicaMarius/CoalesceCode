@@ -6,15 +6,15 @@
 
 ## ◈ META
 
-| Camp                    | Valoare                                              |
-| ----------------------- | ---------------------------------------------------- |
-| **Nume proiect**        | `CoalesceCode`                                       |
-| **Tip**                 | `[x] Tool intern / SaaS developer tool`              |
-| **Versiune initiala**   | `0.0.1-alpha`                                        |
-| **Data start**          | `28/03/2026`                                         |
-| **Data estimata MVP**   | `01/06/2026`                                         |
-| **Durata estimata MVP** | `2 luni`                                             |
-| **Status**              | `[x] In dezvoltare`                                  |
+| Camp                    | Valoare                                 |
+| ----------------------- | --------------------------------------- |
+| **Nume proiect**        | `CoalesceCode`                          |
+| **Tip**                 | `[x] Tool intern / SaaS developer tool` |
+| **Versiune initiala**   | `0.0.1-alpha`                           |
+| **Data start**          | `28/03/2026`                            |
+| **Data estimata MVP**   | `01/06/2026`                            |
+| **Durata estimata MVP** | `2 luni`                                |
+| **Status**              | `[x] In dezvoltare`                     |
 
 ---
 
@@ -176,6 +176,11 @@ Saptamani necesare: ~8
   "start_date": "2026-03-28",
   "mvp_deadline": "2026-06-01",
   "team_size": 3,
+  "team": [
+    "Bica Marius Adrian - Project Manager + Fullstack",
+    "Brasoveanu Eduard - AI Engineer + Frontend",
+    "Boros Kevin - Fullstack + Data Specialist"
+  ],
   "stack": ["React", "JavaScript", "GitHub API"],
   "repos": ["CoalesceCode"],
   "version": "0.0.1-alpha",
