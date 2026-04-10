@@ -1,0 +1,253 @@
+[
+  {
+    "name": "supabase/supabase",
+    "url": "https://github.com/supabase/supabase",
+    "required": ["frontend", "backend", "database"],
+    "expectedKeywords": {
+      "frontend": ["next", "react"],
+      "backend": ["go", "node"],
+      "database": ["postgres", "supabase"],
+      "services": ["auth", "storage"]
+    }
+  },
+  {
+    "name": "ory/kratos",
+    "url": "https://github.com/ory/kratos",
+    "required": ["backend"],
+    "expectedKeywords": {
+      "backend": ["go"],
+      "database": ["postgres", "mysql", "sqlite"],
+      "services": ["auth"]
+    }
+  },
+  {
+    "name": "dapr/dapr",
+    "url": "https://github.com/dapr/dapr",
+    "required": ["backend"],
+    "expectedKeywords": {
+      "backend": ["go"],
+      "services": ["messaging", "pubsub"]
+    }
+  },
+  {
+    "name": "localstack/localstack",
+    "url": "https://github.com/localstack/localstack",
+    "required": ["backend"],
+    "expectedKeywords": {
+      "backend": ["python"],
+      "services": ["aws"]
+    }
+  },
+  {
+    "name": "AppFlowy-IO/AppFlowy",
+    "url": "https://github.com/AppFlowy-IO/AppFlowy",
+    "required": ["frontend"],
+    "expectedKeywords": {
+      "frontend": ["flutter", "dart"],
+      "backend": ["rust"]
+    }
+  },
+  {
+    "name": "gravitl/netmaker",
+    "url": "https://github.com/gravitl/netmaker",
+    "required": ["backend"],
+    "expectedKeywords": {
+      "backend": ["go"],
+      "database": ["sqlite", "postgres"]
+    }
+  },
+  {
+    "name": "standardnotes/app",
+    "url": "https://github.com/standardnotes/app",
+    "required": ["frontend", "backend"],
+    "expectedKeywords": {
+      "frontend": ["react"],
+      "backend": ["node"],
+      "database": ["sqlite", "postgres"]
+    }
+  },
+  {
+    "name": "meilisearch/meilisearch",
+    "url": "https://github.com/meilisearch/meilisearch",
+    "required": ["backend"],
+    "expectedKeywords": {
+      "backend": ["rust"],
+      "services": ["search"]
+    }
+  },
+  {
+    "name": "vercel/next.js",
+    "url": "https://github.com/vercel/next.js",
+    "required": ["frontend", "backend"],
+    "expectedKeywords": {
+      "frontend": ["next", "react"],
+      "backend": ["node"]
+    }
+  },
+  {
+    "name": "strapi/strapi",
+    "url": "https://github.com/strapi/strapi",
+    "required": ["backend", "database"],
+    "expectedKeywords": {
+      "backend": ["node", "koa"],
+      "database": ["postgres", "mysql", "sqlite"]
+    }
+  },
+  {
+    "name": "nestjs/nest",
+    "url": "https://github.com/nestjs/nest",
+    "required": ["backend"],
+    "expectedKeywords": {
+      "backend": ["nestjs", "node"]
+    }
+  },
+  {
+    "name": "django/django",
+    "url": "https://github.com/django/django",
+    "required": ["backend", "database"],
+    "expectedKeywords": {
+      "backend": ["django", "python"],
+      "database": ["sqlite", "postgres", "mysql"]
+    }
+  },
+  {
+    "name": "fastapi/fastapi",
+    "url": "https://github.com/fastapi/fastapi",
+    "required": ["backend"],
+    "expectedKeywords": {
+      "backend": ["fastapi", "python"]
+    }
+  },
+  {
+    "name": "laravel/laravel",
+    "url": "https://github.com/laravel/laravel",
+    "required": ["backend", "database"],
+    "expectedKeywords": {
+      "backend": ["laravel", "php"],
+      "database": ["mysql", "postgres", "sqlite"]
+    }
+  },
+  {
+    "name": "spring-projects/spring-petclinic",
+    "url": "https://github.com/spring-projects/spring-petclinic",
+    "required": ["backend", "database"],
+    "expectedKeywords": {
+      "backend": ["spring", "java"],
+      "database": ["mysql", "h2"]
+    }
+  },
+  {
+    "name": "dotnet/aspnetcore",
+    "url": "https://github.com/dotnet/aspnetcore",
+    "required": ["backend"],
+    "expectedKeywords": {
+      "backend": ["asp.net", "c#", ".net"]
+    }
+  },
+  {
+    "name": "mongodb/mongo",
+    "url": "https://github.com/mongodb/mongo",
+    "required": ["database"],
+    "expectedKeywords": {
+      "database": ["mongodb"]
+    }
+  },
+  {
+    "name": "redis/redis",
+    "url": "https://github.com/redis/redis",
+    "required": ["database"],
+    "expectedKeywords": {
+      "database": ["redis"],
+      "services": ["cache"]
+    }
+  },
+  {
+    "name": "postgres/postgres",
+    "url": "https://github.com/postgres/postgres",
+    "required": ["database"],
+    "expectedKeywords": {
+      "database": ["postgres"]
+    }
+  },
+  {
+    "name": "n8n-io/n8n",
+    "url": "https://github.com/n8n-io/n8n",
+    "required": ["frontend", "backend", "database"],
+    "expectedKeywords": {
+      "frontend": ["vue"],
+      "backend": ["node"],
+      "database": ["postgres", "sqlite", "mysql"]
+    }
+  },
+  {
+    "name": "appsmithorg/appsmith",
+    "url": "https://github.com/appsmithorg/appsmith",
+    "required": ["frontend", "backend"],
+    "expectedKeywords": {
+      "frontend": ["react"],
+      "backend": ["java", "spring"],
+      "database": ["postgres", "mongodb"]
+    }
+  },
+  {
+    "name": "calcom/cal.com",
+    "url": "https://github.com/calcom/cal.com",
+    "required": ["frontend", "backend", "database"],
+    "expectedKeywords": {
+      "frontend": ["next", "react"],
+      "backend": ["node"],
+      "database": ["postgres", "prisma"],
+      "services": ["stripe"]
+    }
+  },
+  {
+    "name": "payloadcms/payload",
+    "url": "https://github.com/payloadcms/payload",
+    "required": ["frontend", "backend", "database"],
+    "expectedKeywords": {
+      "frontend": ["react", "next"],
+      "backend": ["node"],
+      "database": ["postgres", "mongodb"]
+    }
+  },
+  {
+    "name": "ghostfolio/ghostfolio",
+    "url": "https://github.com/ghostfolio/ghostfolio",
+    "required": ["frontend", "backend", "database"],
+    "expectedKeywords": {
+      "frontend": ["angular"],
+      "backend": ["nestjs", "node"],
+      "database": ["postgres", "sqlite"]
+    }
+  },
+  {
+    "name": "mattermost/mattermost",
+    "url": "https://github.com/mattermost/mattermost",
+    "required": ["frontend", "backend", "database"],
+    "expectedKeywords": {
+      "frontend": ["react"],
+      "backend": ["go"],
+      "database": ["postgres", "mysql"]
+    }
+  },
+  {
+    "name": "grafana/grafana",
+    "url": "https://github.com/grafana/grafana",
+    "required": ["frontend", "backend", "database"],
+    "expectedKeywords": {
+      "frontend": ["react"],
+      "backend": ["go"],
+      "database": ["sqlite", "mysql", "postgres"]
+    }
+  },
+  {
+    "name": "BicaMarius/CoalesceCode",
+    "url": "https://github.com/BicaMarius/CoalesceCode",
+    "required": ["frontend", "backend"],
+    "expectedKeywords": {
+      "frontend": ["react"],
+      "backend": ["node", "api"],
+      "services": ["gemini"]
+    }
+  }
+]
