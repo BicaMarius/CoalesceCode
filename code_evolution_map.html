@@ -1,0 +1,2129 @@
+<!doctype html>
+<html lang="ro">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>Code Evolution Map</title>
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      :root {
+        --bg: #0c1018;
+        --s1: #131a27;
+        --s2: #1a2336;
+        --s3: #212d42;
+        --s4: #28364f;
+        --b1: rgba(255, 255, 255, 0.06);
+        --b2: rgba(255, 255, 255, 0.12);
+        --b3: rgba(255, 255, 255, 0.2);
+        --t1: #dde5f5;
+        --t2: #7e8ea8;
+        --t3: #3e4e68;
+        --mono: "SF Mono", "Fira Code", Menlo, monospace;
+        --kickoff: #a78bfa;
+        --kickoff-bg: rgba(167, 139, 250, 0.1);
+        --kickoff-bd: rgba(167, 139, 250, 0.25);
+        --mvp: #fbbf24;
+        --mvp-bg: rgba(251, 191, 36, 0.1);
+        --mvp-bd: rgba(251, 191, 36, 0.25);
+        --r0: #3b82f6;
+        --r1: #10b981;
+        --r2: #f59e0b;
+        --r3: #f472b6;
+        --r4: #a78bfa;
+      }
+      body {
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+        background: var(--bg);
+        color: var(--t1);
+        min-height: 100vh;
+      }
+
+      /* ── HEADER ── */
+      .hdr {
+        position: sticky;
+        top: 0;
+        z-index: 200;
+        background: rgba(13, 16, 24, 0.92);
+        border-bottom: 1px solid var(--b1);
+        backdrop-filter: blur(12px);
+        padding: 0.7rem 1.4rem;
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+        flex-wrap: wrap;
+      }
+      .hdr-logo {
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        color: var(--t2);
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        white-space: nowrap;
+      }
+      .hdr-logo span:first-child {
+        color: var(--kickoff);
+      }
+      .hdr-sep {
+        color: var(--t3);
+      }
+      .hdr-proj {
+        font-size: 14px;
+        font-weight: 700;
+      }
+      .hdr-desc {
+        font-size: 11px;
+        color: var(--t2);
+        max-width: 300px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .hdr-right {
+        margin-left: auto;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+      .btn {
+        font-size: 12px;
+        padding: 0.28rem 0.75rem;
+        border-radius: 7px;
+        border: 1px solid var(--b2);
+        background: var(--s2);
+        color: var(--t2);
+        cursor: pointer;
+        font-family: inherit;
+        transition: all 0.15s;
+        white-space: nowrap;
+      }
+      .btn:hover {
+        color: var(--t1);
+        border-color: var(--b3);
+        background: var(--s3);
+      }
+      .btn.primary {
+        background: rgba(59, 130, 246, 0.15);
+        border-color: rgba(59, 130, 246, 0.35);
+        color: #93c5fd;
+      }
+      .btn.primary:hover {
+        background: rgba(59, 130, 246, 0.22);
+      }
+
+      /* ── FILTER BAR ── */
+      .fbar {
+        background: var(--s1);
+        border-bottom: 1px solid var(--b1);
+        padding: 0.45rem 1.4rem;
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        flex-wrap: wrap;
+      }
+      .flbl {
+        font-size: 10px;
+        color: var(--t3);
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        margin-right: 0.2rem;
+      }
+      .fbtn {
+        font-size: 11px;
+        padding: 0.2rem 0.65rem;
+        border-radius: 20px;
+        border: 1px solid var(--b1);
+        background: transparent;
+        color: var(--t2);
+        cursor: pointer;
+        font-family: inherit;
+        transition: all 0.15s;
+        display: flex;
+        align-items: center;
+        gap: 0.3rem;
+      }
+      .fbtn:hover,
+      .fbtn.on {
+        background: var(--s2);
+        color: var(--t1);
+        border-color: var(--b2);
+      }
+      .fdot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        display: inline-block;
+        flex-shrink: 0;
+      }
+
+      /* ── LAYOUT ── */
+      .wrap {
+        display: flex;
+        min-height: calc(100vh - 90px);
+      }
+      .canvas {
+        flex: 1;
+        padding: 1.4rem 1.5rem 4rem;
+        overflow-x: hidden;
+      }
+
+      /* ── STATS ── */
+      .stats {
+        display: flex;
+        gap: 0.55rem;
+        flex-wrap: wrap;
+        margin-bottom: 1.4rem;
+      }
+      .sc {
+        background: var(--s1);
+        border: 1px solid var(--b1);
+        border-radius: 9px;
+        padding: 0.4rem 0.85rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+      .sc-val {
+        font-size: 17px;
+        font-weight: 700;
+      }
+      .sc-lbl {
+        font-size: 10px;
+        color: var(--t2);
+        line-height: 1.3;
+      }
+
+      /* ── LEGEND ── */
+      .lgnd {
+        display: flex;
+        gap: 0.8rem;
+        flex-wrap: wrap;
+        margin-bottom: 1.4rem;
+        padding: 0.6rem 0.9rem;
+        background: var(--s1);
+        border: 1px solid var(--b1);
+        border-radius: 9px;
+      }
+      .li {
+        display: flex;
+        align-items: center;
+        gap: 0.35rem;
+        font-size: 11px;
+        color: var(--t2);
+      }
+      .ldot {
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+        flex-shrink: 0;
+      }
+      .lline {
+        width: 16px;
+        height: 2px;
+        border-radius: 1px;
+        flex-shrink: 0;
+      }
+
+      /* ── TIMELINE ── */
+      .tl {
+        position: relative;
+        max-width: 820px;
+        margin: 0 auto;
+      }
+      .tl-spine {
+        position: absolute;
+        left: 50%;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        transform: translateX(-50%);
+        background: linear-gradient(
+          to bottom,
+          var(--kickoff),
+          rgba(251, 191, 36, 0.25)
+        );
+        opacity: 0.18;
+        border-radius: 1px;
+        pointer-events: none;
+      }
+
+      /* date group header */
+      .tl-date-hdr {
+        text-align: center;
+        font-size: 10px;
+        color: var(--t3);
+        font-family: var(--mono);
+        letter-spacing: 0.04em;
+        margin: 1.5rem 0 0.5rem;
+        position: relative;
+        z-index: 5;
+      }
+      .tl-date-hdr::before,
+      .tl-date-hdr::after {
+        content: "";
+        position: absolute;
+        top: 50%;
+        height: 1px;
+        width: calc(50% - 60px);
+        background: var(--b1);
+      }
+      .tl-date-hdr::before {
+        left: 0;
+      }
+      .tl-date-hdr::after {
+        right: 0;
+      }
+
+      /* row */
+      .tl-row {
+        position: relative;
+        display: flex;
+        margin-bottom: 1rem;
+        align-items: center;
+        min-height: 72px;
+        animation: fadein 0.25s ease both;
+      }
+      @keyframes fadein {
+        from {
+          opacity: 0;
+          transform: translateY(6px);
+        }
+        to {
+          opacity: 1;
+          transform: none;
+        }
+      }
+      .tl-row.left {
+        justify-content: flex-start;
+        padding-right: calc(50% + 24px);
+      }
+      .tl-row.right {
+        justify-content: flex-end;
+        padding-left: calc(50% + 24px);
+      }
+      .tl-row.full {
+        justify-content: center;
+      }
+      .tl-row.full .tl-card {
+        width: min(440px, 90%);
+      }
+
+      /* connector pseudo-element */
+      .tl-row.left::before,
+      .tl-row.right::before {
+        content: "";
+        position: absolute;
+        top: 50%;
+        height: 1.5px;
+        background: var(--b2);
+        transform: translateY(-50%);
+        z-index: 1;
+      }
+      .tl-row.left::before {
+        right: calc(50% + 7px);
+        left: calc(100% - calc(50% + 24px) - 0px);
+      }
+      /* simplify: just use a fixed 17px connector */
+      .tl-row.left::before {
+        right: calc(50% + 7px);
+        width: 17px;
+        left: auto;
+      }
+      .tl-row.right::before {
+        left: calc(50% + 7px);
+        width: 17px;
+      }
+
+      /* dot */
+      .tl-dot {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        width: 13px;
+        height: 13px;
+        border-radius: 50%;
+        border: 2.5px solid var(--bg);
+        z-index: 10;
+        transition:
+          transform 0.2s,
+          box-shadow 0.2s;
+        cursor: pointer;
+        pointer-events: none;
+      }
+      .tl-row:hover .tl-dot,
+      .tl-row.sel .tl-dot {
+        transform: translate(-50%, -50%) scale(1.5);
+        box-shadow: 0 0 0 5px rgba(255, 255, 255, 0.06);
+      }
+
+      /* ── NODE CARD ── */
+      .tl-card {
+        background: var(--s1);
+        border: 1px solid var(--b1);
+        border-radius: 11px;
+        padding: 0.8rem 0.95rem;
+        cursor: pointer;
+        transition:
+          border-color 0.15s,
+          background 0.15s,
+          transform 0.15s,
+          box-shadow 0.15s;
+        position: relative;
+        z-index: 5;
+        flex: 1;
+        max-width: calc(50% - 24px);
+      }
+      .tl-row.full .tl-card {
+        max-width: 440px;
+        flex: none;
+      }
+      .tl-card:hover {
+        border-color: var(--b2);
+        background: var(--s2);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 24px rgba(0, 0, 0, 0.35);
+      }
+      .tl-row.sel .tl-card {
+        background: var(--s2);
+        transform: translateY(-1px);
+      }
+
+      /* card header */
+      .ch {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 0.45rem;
+      }
+      .cicon {
+        width: 26px;
+        height: 26px;
+        border-radius: 7px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        flex-shrink: 0;
+      }
+      .cm {
+        flex: 1;
+        min-width: 0;
+      }
+      .ctitle {
+        font-size: 13px;
+        font-weight: 600;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        margin-bottom: 1px;
+      }
+      .csub {
+        font-size: 10.5px;
+        color: var(--t2);
+        display: flex;
+        align-items: center;
+        gap: 0.35rem;
+        flex-wrap: wrap;
+      }
+      .vtag {
+        font-family: var(--mono);
+        font-size: 9.5px;
+        padding: 1px 5px;
+        border-radius: 4px;
+        background: var(--s3);
+        color: var(--t1);
+        letter-spacing: 0.02em;
+      }
+      /* card desc */
+      .cdesc {
+        font-size: 11.5px;
+        color: var(--t2);
+        line-height: 1.5;
+        margin-bottom: 0.5rem;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
+      /* pills */
+      .cpills {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.3rem;
+      }
+      .pill {
+        font-size: 10px;
+        padding: 1.5px 6px;
+        border-radius: 20px;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 3px;
+        white-space: nowrap;
+      }
+      .pa {
+        background: rgba(16, 185, 129, 0.12);
+        color: #34d399;
+      }
+      .pm {
+        background: rgba(59, 130, 246, 0.12);
+        color: #60a5fa;
+      }
+      .pd {
+        background: rgba(239, 68, 68, 0.12);
+        color: #f87171;
+      }
+      .pbug {
+        background: rgba(251, 146, 60, 0.12);
+        color: #fb923c;
+      }
+      .pfix {
+        background: rgba(16, 185, 129, 0.12);
+        color: #34d399;
+      }
+      .pt {
+        background: rgba(255, 255, 255, 0.06);
+        color: var(--t2);
+      }
+      .pbrk {
+        background: rgba(239, 68, 68, 0.12);
+        color: #fca5a5;
+        border: 1px solid rgba(239, 68, 68, 0.2);
+      }
+
+      /* kickoff / mvp variants */
+      .tl-row.kickoff-row .tl-card {
+        background: var(--kickoff-bg);
+        border-color: var(--kickoff-bd);
+      }
+      .tl-row.kickoff-row .tl-card:hover {
+        border-color: var(--kickoff);
+      }
+      .tl-row.mvp-row .tl-card {
+        background: var(--mvp-bg);
+        border-color: var(--mvp-bd);
+      }
+      .tl-row.mvp-row .tl-card:hover {
+        border-color: var(--mvp);
+      }
+
+      /* ── DETAIL PANEL ── */
+      .dp {
+        width: 370px;
+        min-width: 370px;
+        background: var(--s1);
+        border-left: 1px solid var(--b1);
+        display: none;
+        flex-direction: column;
+        position: sticky;
+        top: 90px;
+        height: calc(100vh - 90px);
+        overflow: hidden;
+      }
+      .dp.show {
+        display: flex;
+      }
+      .dph {
+        padding: 0.9rem 1.1rem;
+        border-bottom: 1px solid var(--b1);
+        display: flex;
+        align-items: flex-start;
+        gap: 0.6rem;
+      }
+      .dpclose {
+        margin-left: auto;
+        background: none;
+        border: none;
+        color: var(--t2);
+        cursor: pointer;
+        font-size: 17px;
+        padding: 0;
+        line-height: 1;
+        transition: color 0.15s;
+        flex-shrink: 0;
+      }
+      .dpclose:hover {
+        color: var(--t1);
+      }
+      .dpbody {
+        flex: 1;
+        overflow-y: auto;
+        padding: 1rem 1.1rem;
+      }
+      .dps {
+        margin-bottom: 1.2rem;
+      }
+      .dpst {
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--t3);
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+      }
+      .dpkv {
+        display: flex;
+        gap: 0.5rem;
+        margin-bottom: 0.35rem;
+        font-size: 12.5px;
+        line-height: 1.5;
+      }
+      .dpk {
+        color: var(--t2);
+        flex-shrink: 0;
+        width: 105px;
+        font-size: 12px;
+      }
+      .dpv {
+        color: var(--t1);
+        flex: 1;
+        word-break: break-word;
+      }
+      .dplist {
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        gap: 0.3rem;
+      }
+      .dplist li {
+        font-size: 12px;
+        color: var(--t2);
+        padding: 0.3rem 0.6rem;
+        background: var(--s2);
+        border-radius: 6px;
+        display: flex;
+        gap: 0.4rem;
+        align-items: flex-start;
+        line-height: 1.4;
+      }
+      .dplist li em {
+        color: var(--t3);
+        font-style: normal;
+        flex-shrink: 0;
+        margin-top: 1px;
+      }
+      .dplink {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0.38rem 0.6rem;
+        background: var(--s2);
+        border-radius: 6px;
+        margin-bottom: 0.3rem;
+        font-size: 12px;
+        text-decoration: none;
+        color: var(--t1);
+        transition: background 0.15s;
+        border: 1px solid transparent;
+      }
+      .dplink:hover {
+        background: var(--s3);
+        border-color: var(--b2);
+      }
+      .dplink small {
+        color: var(--t3);
+        font-size: 11px;
+      }
+      .dpdiv {
+        height: 1px;
+        background: var(--b1);
+        margin: 0.85rem 0;
+      }
+      .diffbar {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+      .difftrack {
+        flex: 1;
+        height: 4px;
+        background: var(--s3);
+        border-radius: 2px;
+        overflow: hidden;
+      }
+      .difffill {
+        height: 100%;
+        border-radius: 2px;
+        transition: width 0.4s;
+      }
+
+      /* file tag */
+      .ftag {
+        font-size: 10.5px;
+        font-family: var(--mono);
+        padding: 1.5px 6px;
+        border-radius: 4px;
+        background: var(--s3);
+        color: var(--t2);
+        display: inline-block;
+        margin: 0.15rem 0.2rem 0.15rem 0;
+      }
+
+      /* ── MODAL ── */
+      .mbg {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.75);
+        z-index: 500;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 1rem;
+      }
+      .mbg.show {
+        display: flex;
+      }
+      .modal {
+        background: var(--s1);
+        border: 1px solid var(--b2);
+        border-radius: 14px;
+        padding: 1.5rem;
+        width: min(90%, 560px);
+        max-height: 85vh;
+        overflow-y: auto;
+      }
+      .modal h3 {
+        font-size: 16px;
+        font-weight: 700;
+        margin-bottom: 0.25rem;
+      }
+      .modal p {
+        font-size: 12px;
+        color: var(--t2);
+        margin-bottom: 0.9rem;
+        line-height: 1.6;
+      }
+      .modal textarea {
+        width: 100%;
+        height: 180px;
+        background: var(--bg);
+        border: 1px solid var(--b2);
+        border-radius: 8px;
+        padding: 0.7rem;
+        color: var(--t1);
+        font-family: var(--mono);
+        font-size: 11.5px;
+        resize: vertical;
+        outline: none;
+        margin-bottom: 0.7rem;
+        line-height: 1.5;
+      }
+      .modal textarea:focus {
+        border-color: rgba(59, 130, 246, 0.45);
+      }
+      .mbtns {
+        display: flex;
+        gap: 0.5rem;
+        justify-content: flex-end;
+      }
+      .mbtn {
+        padding: 0.4rem 1rem;
+        border-radius: 8px;
+        font-size: 13px;
+        cursor: pointer;
+        font-family: inherit;
+        border: 1px solid var(--b2);
+        background: var(--s2);
+        color: var(--t1);
+        transition: all 0.15s;
+      }
+      .mbtn:hover {
+        background: var(--s3);
+      }
+      .mbtn.p {
+        background: rgba(59, 130, 246, 0.2);
+        border-color: rgba(59, 130, 246, 0.4);
+        color: #93c5fd;
+        font-weight: 600;
+      }
+      .mbtn.p:hover {
+        background: rgba(59, 130, 246, 0.3);
+      }
+      .fmt-hint {
+        background: var(--s2);
+        border: 1px solid var(--b1);
+        border-radius: 8px;
+        padding: 0.75rem 0.9rem;
+        margin-bottom: 0.9rem;
+        font-size: 11.5px;
+        color: var(--t2);
+        line-height: 1.6;
+      }
+      .fmt-hint code {
+        font-family: var(--mono);
+        font-size: 11px;
+        color: var(--t1);
+        background: var(--s3);
+        padding: 1px 5px;
+        border-radius: 4px;
+      }
+
+      /* empty */
+      .empty {
+        text-align: center;
+        padding: 3rem;
+        color: var(--t3);
+        font-size: 14px;
+      }
+      /* scrollbar */
+      ::-webkit-scrollbar {
+        width: 4px;
+        height: 4px;
+      }
+      ::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: var(--b2);
+        border-radius: 2px;
+      }
+    </style>
+  </head>
+  <body>
+    <header class="hdr">
+      <div class="hdr-logo"><span>◈</span><span>Code Evolution Map</span></div>
+      <span class="hdr-sep">/</span>
+      <div style="flex: 1; min-width: 0">
+        <div class="hdr-proj" id="hdr-proj">—</div>
+        <div class="hdr-desc" id="hdr-desc">—</div>
+      </div>
+      <div class="hdr-right">
+        <button
+          class="btn"
+          id="close-dp-btn"
+          style="display: none"
+          onclick="closeDP()"
+        >
+          ✕ Închide
+        </button>
+        <button class="btn" onclick="openGithubModal()">
+          🔗 GitHub Auto-fetch
+        </button>
+        <button class="btn" onclick="showExport()">⬇ Export JSON</button>
+        <button class="btn primary" onclick="openModal()">
+          ⬆ Importă JSON
+        </button>
+      </div>
+    </header>
+    <div
+      id="fetch-status"
+      style="
+        display: none;
+        position: fixed;
+        top: 60px;
+        right: 16px;
+        z-index: 300;
+        background: var(--s2);
+        border: 1px solid var(--b2);
+        border-radius: 10px;
+        padding: 0.5rem 1rem;
+        font-size: 12px;
+        color: var(--t2);
+      "
+    ></div>
+
+    <div class="fbar" id="fbar"></div>
+
+    <div class="wrap">
+      <main class="canvas">
+        <div class="stats" id="stats"></div>
+        <div class="lgnd" id="lgnd"></div>
+        <div class="tl" id="tl"><div class="tl-spine"></div></div>
+      </main>
+      <aside class="dp" id="dp">
+        <div class="dph" id="dph"></div>
+        <div class="dpbody" id="dpbody"></div>
+      </aside>
+    </div>
+
+    <!-- GITHUB FETCH MODAL -->
+    <div class="mbg" id="ghbg" onclick="closeGhModalBg(event)">
+      <div class="modal">
+        <h3>🔗 GitHub Auto-fetch</h3>
+        <p>
+          Introdu URL-ul repository-ului tău GitHub și folderul cu blueprints.
+          Agentul va extrage automat toate METADATA_JSON din fișierele Blueprint
+          02.
+        </p>
+        <div class="fmt-hint">
+          Format URL: <code>https://github.com/USER/REPO</code><br />
+          Folder blueprints: <code>docs/pushes</code> (default)<br /><br />
+          ⚠️ Repository-ul trebuie să fie <strong>public</strong> sau să ai un
+          <strong>Personal Access Token</strong>.
+        </div>
+        <div
+          style="
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            margin-bottom: 0.7rem;
+          "
+        >
+          <input
+            id="gh-url"
+            type="text"
+            placeholder="https://github.com/username/repo-name"
+            style="
+              width: 100%;
+              padding: 0.5rem 0.7rem;
+              background: var(--bg);
+              border: 1px solid var(--b2);
+              border-radius: 8px;
+              color: var(--t1);
+              font-size: 13px;
+              font-family: inherit;
+              outline: none;
+            "
+          />
+          <input
+            id="gh-folder"
+            type="text"
+            placeholder="docs/pushes (default)"
+            style="
+              width: 100%;
+              padding: 0.5rem 0.7rem;
+              background: var(--bg);
+              border: 1px solid var(--b2);
+              border-radius: 8px;
+              color: var(--t1);
+              font-size: 13px;
+              font-family: inherit;
+              outline: none;
+            "
+          />
+          <input
+            id="gh-token"
+            type="password"
+            placeholder="GitHub Personal Access Token (opțional — pentru repo privat)"
+            style="
+              width: 100%;
+              padding: 0.5rem 0.7rem;
+              background: var(--bg);
+              border: 1px solid var(--b2);
+              border-radius: 8px;
+              color: var(--t1);
+              font-size: 13px;
+              font-family: inherit;
+              outline: none;
+            "
+          />
+          <input
+            id="gh-branch"
+            type="text"
+            placeholder="Branch (default: main)"
+            style="
+              width: 100%;
+              padding: 0.5rem 0.7rem;
+              background: var(--bg);
+              border: 1px solid var(--b2);
+              border-radius: 8px;
+              color: var(--t1);
+              font-size: 13px;
+              font-family: inherit;
+              outline: none;
+            "
+          />
+        </div>
+        <div
+          id="gh-progress"
+          style="
+            display: none;
+            font-size: 11.5px;
+            color: var(--t2);
+            margin-bottom: 0.5rem;
+            padding: 0.5rem;
+            background: var(--s2);
+            border-radius: 6px;
+            line-height: 1.8;
+            max-height: 150px;
+            overflow-y: auto;
+          "
+        ></div>
+        <div class="mbtns">
+          <button class="mbtn" onclick="closeGhModal()">Anulează</button>
+          <button class="mbtn p" id="gh-fetch-btn" onclick="doGithubFetch()">
+            🔗 Fetch din GitHub
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- IMPORT MODAL -->
+    <div class="mbg" id="mbg" onclick="closeModalBg(event)">
+      <div class="modal">
+        <h3>Importă date proiect</h3>
+        <p>
+          Lipește JSON-ul generat din blueprinturile proiectului. Fiecare
+          blueprint conține un bloc
+          <code style="font-family: monospace; font-size: 11px"
+            >METADATA_JSON</code
+          >
+          — extrage valorile și construiește obiectul de mai jos.
+        </p>
+        <div class="fmt-hint">
+          Format așteptat:
+          <code
+            >{"project":"Nume","description":"...","repos":{"repo-name":{"color":"#hex","label":"Label","short":"XX"}},"events":[...]}</code
+          ><br /><br />
+          Tipuri de events: <code>"kickoff"</code> · <code>"push"</code> ·
+          <code>"mvp"</code>
+        </div>
+        <textarea
+          id="import-ta"
+          placeholder="Lipește JSON-ul tău aici..."
+          spellcheck="false"
+        ></textarea>
+        <div class="mbtns">
+          <button class="mbtn" onclick="closeModal()">Anulează</button>
+          <button class="mbtn p" onclick="doImport()">Încarcă harta</button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // ═══════════════════════════════════════════════
+      //  DEMO DATA
+      // ═══════════════════════════════════════════════
+      const DEMO = {
+        project: "GameApp",
+        description: "Joc mobile puzzle multiplayer cu leaderboard global",
+        team: ["Andrei — Frontend", "Maria — Backend", "Ion — Fullstack / AI"],
+        repos: {
+          "gameapp-frontend": {
+            color: "#60a5fa",
+            label: "Frontend",
+            short: "FE",
+          },
+          "gameapp-backend": {
+            color: "#34d399",
+            label: "Backend",
+            short: "BE",
+          },
+          "gameapp-shared": { color: "#fb923c", label: "Shared", short: "SH" },
+        },
+        events: [
+          {
+            id: "kickoff",
+            type: "kickoff",
+            date: "2025-01-01",
+            version: "0.0.1",
+            title: "Kickoff proiect",
+            summary:
+              "Viziune definită, echipă formată, stack ales, roadmap MVP planificat. Timp estimat: 4 săptămâni.",
+            details: {
+              mvp_deadline: "2025-02-01",
+              team: [
+                "Andrei — FE (React Native, TypeScript)",
+                "Maria — BE (Node.js, PostgreSQL, Redis)",
+                "Ion — Fullstack / AI (integrări, shared)",
+              ],
+              stack: [
+                "React Native",
+                "Expo",
+                "Node.js",
+                "Express",
+                "PostgreSQL",
+                "Redis",
+                "AWS EC2",
+                "GitHub Actions",
+              ],
+              mvp_features: [
+                "Auth + profil utilizator",
+                "Gameplay core puzzle 2D",
+                "Leaderboard global real-time",
+                "Sistem vieți + recompense zilnice",
+              ],
+              out_of_scope: [
+                "Multiplayer real-time",
+                "Notificări push",
+                "Teme vizuale multiple",
+                "Social features",
+              ],
+              investment: "~850€ (hosting AWS + Expo + servicii externe)",
+              monetization: "Freemium + IAP (vieți extra, cosmetice)",
+              estimated_revenue: "500–2.500€/lună după luna 3",
+            },
+          },
+          {
+            id: "p1",
+            type: "push",
+            repo: "gameapp-frontend",
+            date: "2025-01-05",
+            version: "0.1.0",
+            author: "Andrei",
+            title: "Setup inițial + Design system",
+            summary:
+              "Boilerplate React Native, navigare stack, screen-uri placeholder, tema culori și fonturi centralizată în theme/",
+            hours: 5,
+            difficulty: 3,
+            added: [
+              "App.tsx",
+              "navigation/AppNavigator.tsx",
+              "screens/Home.tsx",
+              "screens/Game.tsx",
+              "theme/colors.ts",
+              "theme/typography.ts",
+            ],
+            modified: [],
+            deleted: [],
+            bugs_fixed: [],
+            bugs_known: ["Splash screen cu întârziere 300ms pe Android 12"],
+            breaking_changes: false,
+            notes:
+              "Design system bazat pe Figma. Toate culorile/fonturile în theme/ — nu hardcoda nimic direct în componente.",
+          },
+          {
+            id: "p2",
+            type: "push",
+            repo: "gameapp-backend",
+            date: "2025-01-07",
+            version: "0.1.0",
+            author: "Maria",
+            title: "Setup API Express + Schema DB",
+            summary:
+              "Express.js inițializat, schema PostgreSQL Users+Scores, middleware CORS/body-parser, .env configurat",
+            hours: 7,
+            difficulty: 5,
+            added: [
+              "server.js",
+              "models/User.js",
+              "models/Score.js",
+              "routes/auth.js",
+              "db/schema.sql",
+              "db/seed.js",
+              ".env.example",
+            ],
+            modified: [],
+            deleted: [],
+            bugs_fixed: [],
+            bugs_known: [],
+            breaking_changes: false,
+            notes:
+              "Schema DB finalizată — orice modificare ulterioară necesită migration script. Nu modifica direct schema.sql în prod.",
+          },
+          {
+            id: "p3",
+            type: "push",
+            repo: "gameapp-frontend",
+            date: "2025-01-12",
+            version: "0.2.0",
+            author: "Andrei",
+            title: "Gameplay core — logică match-3",
+            summary:
+              "Grid 5×5, logică match-3 completă, animații tile cu spring physics, scor în timp real, powerup-uri de bază",
+            hours: 14,
+            difficulty: 8,
+            added: [
+              "components/GameGrid.tsx",
+              "hooks/useGameLogic.ts",
+              "utils/matchChecker.ts",
+              "utils/scoreCalc.ts",
+              "assets/tiles/",
+            ],
+            modified: ["screens/Game.tsx", "theme/animations.ts"],
+            deleted: ["screens/GamePlaceholder.tsx"],
+            bugs_fixed: [
+              "Fix crash la rotire rapidă a device-ului",
+              "Fix dublare animație pe match în cascadă",
+            ],
+            bugs_known: [
+              "Frame drops pe device-uri din 2018 sau mai vechi",
+              "Tile swap uneori ratate pe touchscreen rapid",
+            ],
+            breaking_changes: false,
+            notes:
+              "Match-3 logic a luat 2 zile extra față de estimare — complexitate mai mare decât anticipat. Optimizare perf. vechi devices = TODO v0.3.",
+          },
+          {
+            id: "p4",
+            type: "push",
+            repo: "gameapp-backend",
+            date: "2025-01-14",
+            version: "0.2.0",
+            author: "Maria",
+            title: "Auth JWT + Leaderboard API + Redis",
+            summary:
+              "Login/register cu JWT + refresh tokens rotative, endpoint leaderboard cu Redis cache (latență redusă 800ms → 40ms)",
+            hours: 10,
+            difficulty: 7,
+            added: [
+              "middleware/auth.js",
+              "routes/leaderboard.js",
+              "services/redis.js",
+              "services/cache.js",
+            ],
+            modified: ["routes/auth.js", "models/User.js", "server.js"],
+            deleted: [],
+            bugs_fixed: [
+              "Fix race condition la refresh token simultan",
+              "Fix SQL injection în query username",
+            ],
+            bugs_known: ["Paginare leaderboard incorectă peste 1000 entries"],
+            breaking_changes: true,
+            breaking_detail:
+              "BREAKING: Toate rutele /api/* necesită acum header Authorization: Bearer <token>. FE trebuie actualizat!",
+            notes:
+              "Redis a redus latența leaderboard de la ~800ms la ~40ms. Adaugă REDIS_URL în .env înainte de a rula.",
+          },
+          {
+            id: "p5",
+            type: "push",
+            repo: "gameapp-shared",
+            date: "2025-01-17",
+            version: "0.1.0",
+            author: "Ion",
+            title: "Shared types + validatori + utils",
+            summary:
+              "TypeScript types comune (User, Score, GameState), validatori Zod, constante game, utils de formatare shared între FE și BE",
+            hours: 4,
+            difficulty: 3,
+            added: [
+              "types/index.ts",
+              "types/game.ts",
+              "validators/score.ts",
+              "validators/user.ts",
+              "constants/game.ts",
+              "utils/format.ts",
+            ],
+            modified: [],
+            deleted: [],
+            bugs_fixed: [],
+            bugs_known: [],
+            breaking_changes: false,
+            notes:
+              "Ambele repo-uri importă din @gameapp/shared via npm workspace. Rulează npm install din root după pull.",
+          },
+          {
+            id: "p6",
+            type: "push",
+            repo: "gameapp-frontend",
+            date: "2025-01-21",
+            version: "0.3.0",
+            author: "Andrei",
+            title: "UI Polish + Integrare API reală",
+            summary:
+              "Conectare la backend live, screen-uri auth complete, leaderboard real-time via WebSocket, eliminat tot mock data",
+            hours: 12,
+            difficulty: 6,
+            added: [
+              "screens/Login.tsx",
+              "screens/Register.tsx",
+              "screens/Leaderboard.tsx",
+              "services/api.ts",
+              "hooks/useAuth.ts",
+              "hooks/useLeaderboard.ts",
+            ],
+            modified: [
+              "screens/Home.tsx",
+              "screens/Game.tsx",
+              "components/GameGrid.tsx",
+              "App.tsx",
+            ],
+            deleted: [
+              "screens/MockLeaderboard.tsx",
+              "data/mockUsers.ts",
+              "data/mockScores.ts",
+            ],
+            bugs_fixed: [
+              "Fix crash la token refresh expirat în background",
+              "Fix scroll infinit pe leaderboard cu date reale",
+              "Fix animație scor dispărută pe iOS 16.x",
+            ],
+            bugs_known: [
+              "Notificări push nefuncționale pe Android 13+ (API change Google)",
+            ],
+            breaking_changes: false,
+            notes:
+              "Tot mock data eliminat. App folosește exclusiv API live. Setează EXPO_PUBLIC_API_URL în .env.",
+          },
+          {
+            id: "p7",
+            type: "push",
+            repo: "gameapp-backend",
+            date: "2025-01-24",
+            version: "0.3.0",
+            author: "Maria",
+            title: "Docker + CI/CD + Rate limiting + Prod",
+            summary:
+              "Dockerizare completă, GitHub Actions pipeline (test→build→deploy automat pe main), rate limiting 100req/min, AWS prod live",
+            hours: 8,
+            difficulty: 7,
+            added: [
+              "Dockerfile",
+              "docker-compose.yml",
+              ".github/workflows/deploy.yml",
+              "middleware/rateLimit.js",
+              "config/production.js",
+              "scripts/healthcheck.sh",
+            ],
+            modified: ["server.js", "package.json", "README.md"],
+            deleted: ["scripts/manual-deploy.sh"],
+            bugs_fixed: [
+              "Fix memory leak la conexiuni WebSocket ținute deschise",
+              "Fix env variables care nu se încărcau în Docker",
+            ],
+            bugs_known: [],
+            breaking_changes: false,
+            notes:
+              "Pipeline deployează automat pe push în main. Staging pe develop. Secretele sunt în GitHub Secrets — nu în .env commit.",
+          },
+          {
+            id: "mvp",
+            type: "mvp",
+            date: "2025-01-25",
+            version: "1.0.0",
+            title: "MVP Launch",
+            summary:
+              "GameApp publicat pe App Store și Google Play. Toate funcțiile MVP livrate. 60h muncă echipă, 7 push-uri, 3 repo-uri.",
+            details: {
+              published: ["App Store (iOS 14+)", "Google Play (Android 10+)"],
+              features_delivered: 4,
+              features_planned: 4,
+              total_hours: 60,
+              total_pushes: 7,
+              bugs_at_launch: 1,
+              satisfaction: "4/5",
+              store_links: {
+                "App Store": "https://apps.apple.com/",
+                "Google Play": "https://play.google.com/",
+              },
+              ops_links: {
+                "Analytics (Mixpanel)": "https://mixpanel.com/",
+                "DB Prod (AWS RDS)": "https://aws.amazon.com/rds/",
+                "Errors (Sentry)": "https://sentry.io/",
+              },
+              next: "v1.1 — Notificări push (2 săpt.) + 10 nivele noi (1 săpt.) + tutorial interactiv (3 zile)",
+              lessons: [
+                "Match-3 logic a luat 2 zile extra — la gameplay complex estimările × 1.5",
+                "Redis ar fi trebuit inclus din sprint-ul 1, nu ca optimizare ulterioară",
+                "Shared package a economisit ~3h de cod duplicat pe săptămână",
+                "CI/CD trebuie implementat din sprint-ul 1, nu înainte de launch",
+              ],
+            },
+          },
+        ],
+      };
+
+      // ═══════════════════════════════════════════════
+      //  STATE
+      // ═══════════════════════════════════════════════
+      let DATA = DEMO;
+      let selId = null;
+      let activeFilter = "all";
+      const REPO_COLORS = [
+        "#60a5fa",
+        "#34d399",
+        "#fb923c",
+        "#f472b6",
+        "#a78bfa",
+        "#fbbf24",
+      ];
+
+      function repoColor(repo) {
+        return DATA.repos[repo]?.color || "#7e8ea8";
+      }
+      function repoLabel(repo) {
+        return DATA.repos[repo]?.label || repo;
+      }
+      function repoShort(repo) {
+        return DATA.repos[repo]?.short || repo.slice(0, 2).toUpperCase();
+      }
+
+      function typeConf(ev) {
+        if (ev.type === "kickoff")
+          return { color: "#a78bfa", icon: "🚀", label: "Kickoff" };
+        if (ev.type === "mvp")
+          return { color: "#fbbf24", icon: "🏁", label: "MVP Launch" };
+        return {
+          color: repoColor(ev.repo),
+          icon: "📦",
+          label: repoLabel(ev.repo),
+        };
+      }
+
+      // ═══════════════════════════════════════════════
+      //  STATS
+      // ═══════════════════════════════════════════════
+      function renderStats() {
+        const pushes = DATA.events.filter((e) => e.type === "push");
+        const hours = pushes.reduce((s, e) => s + (e.hours || 0), 0);
+        const bugs = pushes.reduce(
+          (s, e) => s + (e.bugs_fixed || []).length,
+          0,
+        );
+        const files = pushes.reduce(
+          (s, e) => s + (e.added || []).length + (e.modified || []).length,
+          0,
+        );
+        const items = [
+          { v: pushes.length, l: "Push-uri" },
+          { v: hours + "h", l: "Ore lucrate" },
+          { v: bugs, l: "Buguri fixate" },
+          { v: files, l: "Fișiere atinse" },
+          { v: Object.keys(DATA.repos).length, l: "Repo-uri" },
+        ];
+        document.getElementById("stats").innerHTML = items
+          .map(
+            (i) => `
+    <div class="sc"><span class="sc-val">${i.v}</span><span class="sc-lbl">${i.l}</span></div>`,
+          )
+          .join("");
+      }
+
+      // ═══════════════════════════════════════════════
+      //  LEGEND
+      // ═══════════════════════════════════════════════
+      function renderLegend() {
+        let h = `<div class="li"><span class="ldot" style="background:#a78bfa"></span>Kickoff</div>`;
+        for (const [repo, cfg] of Object.entries(DATA.repos))
+          h += `<div class="li"><span class="ldot" style="background:${cfg.color}"></span>${cfg.label}</div>`;
+        h += `<div class="li"><span class="ldot" style="background:#fbbf24"></span>MVP Launch</div>`;
+        h += `<div class="li" style="margin-left:auto"><span class="lline" style="background:rgba(248,113,113,.7)"></span>Breaking change</div>`;
+        document.getElementById("lgnd").innerHTML = h;
+      }
+
+      // ═══════════════════════════════════════════════
+      //  FILTERS
+      // ═══════════════════════════════════════════════
+      function renderFilters() {
+        let h = `<span class="flbl">Filtrare</span>
+    <button class="fbtn ${activeFilter === "all" ? "on" : ""}" onclick="setFilter('all')">Toate</button>`;
+        for (const [repo, cfg] of Object.entries(DATA.repos))
+          h += `<button class="fbtn ${activeFilter === repo ? "on" : ""}" onclick="setFilter('${repo}')">
+      <span class="fdot" style="background:${cfg.color}"></span>${cfg.label}</button>`;
+        h += `<button class="fbtn ${activeFilter === "bugs" ? "on" : ""}" onclick="setFilter('bugs')">🐛 Cu buguri</button>`;
+        h += `<button class="fbtn ${activeFilter === "breaking" ? "on" : ""}" onclick="setFilter('breaking')">⚡ Breaking</button>`;
+        document.getElementById("fbar").innerHTML = h;
+      }
+
+      // ═══════════════════════════════════════════════
+      //  TIMELINE
+      // ═══════════════════════════════════════════════
+      function renderTimeline() {
+        const tl = document.getElementById("tl");
+        tl.innerHTML = '<div class="tl-spine"></div>';
+        const repoList = Object.keys(DATA.repos);
+
+        let evs = DATA.events.filter((e) => {
+          if (activeFilter === "all") return true;
+          if (activeFilter === "bugs")
+            return (
+              (e.bugs_fixed || []).length > 0 || (e.bugs_known || []).length > 0
+            );
+          if (activeFilter === "breaking")
+            return (
+              e.breaking_changes === true ||
+              e.type === "kickoff" ||
+              e.type === "mvp"
+            );
+          return (
+            e.repo === activeFilter || e.type === "kickoff" || e.type === "mvp"
+          );
+        });
+
+        if (!evs.length) {
+          tl.innerHTML +=
+            '<div class="empty">Niciun eveniment pentru filtrul selectat.</div>';
+          return;
+        }
+
+        let lastMonth = "";
+        let rowDelay = 0;
+
+        evs.forEach((ev) => {
+          const cfg = typeConf(ev);
+          const isFull = ev.type === "kickoff" || ev.type === "mvp";
+          const ri = repoList.indexOf(ev.repo);
+          const side = isFull ? "full" : ri % 2 === 0 ? "left" : "right";
+
+          // date header
+          const m = ev.date.slice(0, 7);
+          if (m !== lastMonth) {
+            const dh = document.createElement("div");
+            dh.className = "tl-date-hdr";
+            dh.textContent = fmtMonth(ev.date);
+            tl.appendChild(dh);
+            lastMonth = m;
+          }
+
+          // row
+          const row = document.createElement("div");
+          row.className = `tl-row ${side}${ev.type === "kickoff" ? " kickoff-row" : ""}${ev.type === "mvp" ? " mvp-row" : ""}${selId === ev.id ? " sel" : ""}`;
+          row.id = `row-${ev.id}`;
+          row.style.animationDelay = `${rowDelay * 0.04}s`;
+          rowDelay++;
+
+          // dot
+          const dot = document.createElement("div");
+          dot.className = "tl-dot";
+          dot.style.background = cfg.color;
+          if (ev.breaking_changes)
+            dot.style.boxShadow = `0 0 0 3px rgba(248,113,113,.35)`;
+
+          // card
+          const card = document.createElement("div");
+          card.className = "tl-card";
+          if (selId === ev.id) card.style.borderColor = cfg.color;
+          card.onclick = () => selectEv(ev.id);
+          card.innerHTML = buildCard(ev, cfg);
+
+          row.appendChild(dot);
+          row.appendChild(card);
+          tl.appendChild(row);
+        });
+      }
+
+      function fmtMonth(d) {
+        return new Date(d).toLocaleDateString("ro-RO", {
+          day: "numeric",
+          month: "long",
+          year: "numeric",
+        });
+      }
+
+      function buildCard(ev, cfg) {
+        let pills = "";
+        if (ev.type === "push") {
+          const a = (ev.added || []).length,
+            m = (ev.modified || []).length,
+            d = (ev.deleted || []).length;
+          const bf = (ev.bugs_fixed || []).length,
+            bk = (ev.bugs_known || []).length;
+          if (a) pills += `<span class="pill pa">+${a}</span>`;
+          if (m) pills += `<span class="pill pm">~${m}</span>`;
+          if (d) pills += `<span class="pill pd">−${d}</span>`;
+          if (bf) pills += `<span class="pill pfix">✓${bf} fix</span>`;
+          if (bk) pills += `<span class="pill pbug">⚠${bk}</span>`;
+          if (ev.hours) pills += `<span class="pill pt">⏱ ${ev.hours}h</span>`;
+          if (ev.breaking_changes)
+            pills += `<span class="pill pbrk">⚡ Breaking</span>`;
+        }
+        if (ev.type === "kickoff") {
+          const m = (ev.details?.team || []).length,
+            f = (ev.details?.mvp_features || []).length;
+          pills += `<span class="pill pa">${m} membri</span><span class="pill pm">${f} funcții MVP</span>`;
+        }
+        if (ev.type === "mvp") {
+          const d = ev.details || {};
+          pills += `<span class="pill pa">${d.features_delivered || 0}/${d.features_planned || 0} funcții</span>`;
+          pills += `<span class="pill pt">⏱ ${d.total_hours || 0}h total</span>`;
+          if (d.bugs_at_launch)
+            pills += `<span class="pill pbug">⚠${d.bugs_at_launch} bug</span>`;
+        }
+
+        const sub = [];
+        if (ev.version) sub.push(`<span class="vtag">v${ev.version}</span>`);
+        if (ev.repo)
+          sub.push(
+            `<span style="color:${cfg.color};font-weight:600">${repoShort(ev.repo)}</span>`,
+          );
+        if (ev.author) sub.push(`<span>${ev.author}</span>`);
+        if (ev.date) sub.push(`<span>${ev.date}</span>`);
+
+        return `<div class="ch">
+    <div class="cicon" style="background:${cfg.color}18;color:${cfg.color}">${cfg.icon}</div>
+    <div class="cm">
+      <div class="ctitle">${ev.title}</div>
+      <div class="csub">${sub.join('<span style="color:var(--t3)"> · </span>')}</div>
+    </div>
+  </div>
+  <div class="cdesc">${ev.summary}</div>
+  <div class="cpills">${pills}</div>`;
+      }
+
+      // ═══════════════════════════════════════════════
+      //  SELECT / DETAIL PANEL
+      // ═══════════════════════════════════════════════
+      function selectEv(id) {
+        selId = id;
+        document.querySelectorAll(".tl-row").forEach((r) => {
+          const isMe = r.id === `row-${id}`;
+          r.classList.toggle("sel", isMe);
+          const c = r.querySelector(".tl-card");
+          if (c)
+            c.style.borderColor = isMe
+              ? typeConf(DATA.events.find((e) => e.id === id) || {}).color
+              : "";
+        });
+        openDP(id);
+      }
+
+      function openDP(id) {
+        const ev = DATA.events.find((e) => e.id === id);
+        if (!ev) return;
+        const cfg = typeConf(ev);
+        const dp = document.getElementById("dp");
+        const dph = document.getElementById("dph");
+        const dpbody = document.getElementById("dpbody");
+
+        dph.innerHTML = `
+    <div class="cicon" style="background:${cfg.color}18;color:${cfg.color};width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0">${cfg.icon}</div>
+    <div style="flex:1;min-width:0">
+      <div style="font-size:14px;font-weight:700;margin-bottom:1px">${ev.title}</div>
+      <div style="font-size:11px;color:var(--t2)">${ev.date}${ev.version ? ` · <span class="vtag">v${ev.version}</span>` : ""}</div>
+    </div>
+    <button class="dpclose" onclick="closeDP()">✕</button>`;
+
+        dpbody.innerHTML = buildDetail(ev);
+        dp.classList.add("show");
+        document.getElementById("close-dp-btn").style.display = "";
+      }
+
+      function buildDetail(ev) {
+        let h = "";
+        // summary box
+        h += `<div class="dps">
+    <div class="dpst">Rezumat</div>
+    <div style="font-size:13px;color:var(--t1);line-height:1.65;padding:.65rem .8rem;background:var(--s2);border-radius:8px">${ev.summary}</div>
+  </div>`;
+
+        if (ev.type === "push") {
+          h += `<div class="dps"><div class="dpst">Detalii</div>
+      ${kv("Tag", `<span style="color:${repoColor(ev.repo)}">${repoLabel(ev.repo)}</span>`)}
+      ${kv("Repo", ev.repo_display || ev.repo_source || ev.repo)}
+      ${kv("Autor", ev.author)}
+      ${kv("Versiune", ev.version ? `<span class="vtag">v${ev.version}</span>` : "—")}
+      ${kv("Ore lucrate", ev.hours ? ev.hours + "h" : "—")}
+      ${kv("Dificultate", diffBar(ev.difficulty))}
+      ${ev.breaking_changes ? kv("Breaking change", `<span style="color:#fca5a5">⚡ ${ev.breaking_detail || "Da"}</span>`) : ""}
+    </div>`;
+
+          if (
+            (ev.added || []).length ||
+            (ev.modified || []).length ||
+            (ev.deleted || []).length
+          ) {
+            h += `<div class="dps"><div class="dpst">Modificări fișiere</div>`;
+            if (ev.added?.length) {
+              h += `<div style="font-size:10.5px;color:#34d399;font-weight:700;margin:.2rem 0 .35rem">+ Adăugate (${ev.added.length})</div>`;
+              h += ev.added
+                .map((f) => `<span class="ftag">${f}</span>`)
+                .join("");
+            }
+            if (ev.modified?.length) {
+              h += `<div style="font-size:10.5px;color:#60a5fa;font-weight:700;margin:.5rem 0 .35rem">~ Modificate (${ev.modified.length})</div>`;
+              h += ev.modified
+                .map(
+                  (f) => `<span class="ftag" style="color:#93c5fd">${f}</span>`,
+                )
+                .join("");
+            }
+            if (ev.deleted?.length) {
+              h += `<div style="font-size:10.5px;color:#f87171;font-weight:700;margin:.5rem 0 .35rem">− Șterse (${ev.deleted.length})</div>`;
+              h += ev.deleted
+                .map(
+                  (f) => `<span class="ftag" style="color:#fca5a5">${f}</span>`,
+                )
+                .join("");
+            }
+            h += `</div>`;
+          }
+
+          if ((ev.bugs_fixed || []).length || (ev.bugs_known || []).length) {
+            h += `<div class="dps"><div class="dpst">Buguri</div>`;
+            if (ev.bugs_fixed?.length) {
+              h += `<div style="font-size:10.5px;color:#34d399;font-weight:700;margin-bottom:.35rem">✓ Fixate</div>`;
+              h += `<ul class="dplist">${ev.bugs_fixed.map((b) => `<li><em>✓</em>${b}</li>`).join("")}</ul>`;
+            }
+            if (ev.bugs_known?.length) {
+              h += `<div style="font-size:10.5px;color:#fb923c;font-weight:700;margin:${ev.bugs_fixed?.length ? ".5rem " : " "}0 .35rem">⚠ Cunoscute</div>`;
+              h += `<ul class="dplist">${ev.bugs_known.map((b) => `<li><em>⚠</em>${b}</li>`).join("")}</ul>`;
+            }
+            h += `</div>`;
+          }
+
+          if (ev.notes)
+            h += `<div class="dps"><div class="dpst">Note echipă</div>
+        <div style="font-size:12.5px;color:var(--t2);line-height:1.65;padding:.6rem .8rem;background:var(--s2);border-radius:8px;border-left:2px solid var(--b2)">${ev.notes}</div>
+      </div>`;
+        }
+
+        if (ev.type === "kickoff") {
+          const d = ev.details || {};
+          h += `<div class="dps"><div class="dpst">Echipă</div>
+      <ul class="dplist">${(d.team || []).map((m) => `<li><em>👤</em>${m}</li>`).join("")}</ul>
+    </div>`;
+          h += `<div class="dps"><div class="dpst">Stack</div>
+      <div style="display:flex;flex-wrap:wrap;gap:.3rem">${(d.stack || []).map((s) => `<span class="vtag" style="font-size:11px;padding:2px 7px">${s}</span>`).join("")}</div>
+    </div>`;
+          h += `<div class="dps"><div class="dpst">Funcții MVP</div>
+      <ul class="dplist">${(d.mvp_features || []).map((f) => `<li><em>✅</em>${f}</li>`).join("")}</ul>
+    </div>`;
+          if (d.out_of_scope?.length)
+            h += `<div class="dps"><div class="dpst">Out of scope</div>
+        <ul class="dplist">${d.out_of_scope.map((f) => `<li><em>🔜</em>${f}</li>`).join("")}</ul>
+      </div>`;
+          h += `<div class="dps"><div class="dpst">Business</div>
+      ${kv("Investiție", d.investment)}${kv("Monetizare", d.monetization)}${kv("Venit estimat", d.estimated_revenue)}${kv("Deadline MVP", d.mvp_deadline)}
+    </div>`;
+        }
+
+        if (ev.type === "mvp") {
+          const d = ev.details || {};
+          h += `<div class="dps"><div class="dpst">Statistici finale</div>
+      ${kv("Funcții livrate", `${d.features_delivered}/${d.features_planned}`)}
+      ${kv("Total ore", d.total_hours + "h")}${kv("Total push-uri", d.total_pushes)}
+      ${kv("Buguri la lansare", d.bugs_at_launch)}${kv("Satisfacție", d.satisfaction)}
+    </div>`;
+          h += `<div class="dps"><div class="dpst">Publicat pe</div>
+      <ul class="dplist">${(d.published || []).map((p) => `<li><em>🚀</em>${p}</li>`).join("")}</ul>
+    </div>`;
+          const allLinks = { ...(d.store_links || {}), ...(d.ops_links || {}) };
+          if (Object.keys(allLinks).length) {
+            h += `<div class="dps"><div class="dpst">Linkuri rapide</div>`;
+            for (const [lbl, url] of Object.entries(allLinks))
+              h += `<a class="dplink" href="${url}" target="_blank"><span>${lbl}</span><small>↗</small></a>`;
+            h += `</div>`;
+          }
+          if (d.next)
+            h += `<div class="dps"><div class="dpst">Urmează — v1.1</div>
+        <div style="font-size:12.5px;color:var(--t1);padding:.6rem .8rem;background:var(--mvp-bg);border-radius:8px;border:1px solid var(--mvp-bd);line-height:1.6">${d.next}</div>
+      </div>`;
+          if (d.lessons?.length)
+            h += `<div class="dps"><div class="dpst">Lecții învățate</div>
+        <ul class="dplist">${d.lessons.map((l) => `<li><em>💡</em>${l}</li>`).join("")}</ul>
+      </div>`;
+        }
+
+        return h;
+      }
+
+      function kv(k, v) {
+        return `<div class="dpkv"><span class="dpk">${k}</span><span class="dpv">${v || "—"}</span></div>`;
+      }
+
+      function diffBar(s) {
+        if (!s) return "—";
+        const cols = [
+          "",
+          "#34d399",
+          "#34d399",
+          "#34d399",
+          "#60a5fa",
+          "#60a5fa",
+          "#60a5fa",
+          "#fb923c",
+          "#fb923c",
+          "#f87171",
+          "#f87171",
+        ];
+        const lbls = [
+          "",
+          "Trivial",
+          "Trivial",
+          "Ușor",
+          "Moderat",
+          "Moderat",
+          "Mediu",
+          "Complex",
+          "Complex",
+          "Avansat",
+          "Extrem",
+        ];
+        return `<div class="diffbar">
+    <span style="color:${cols[s] || "#7e8ea8"};font-weight:700;min-width:30px">${s}/10</span>
+    <div class="difftrack"><div class="difffill" style="width:${s * 10}%;background:${cols[s] || "#7e8ea8"}"></div></div>
+    <span style="font-size:11px;color:var(--t3);min-width:50px">${lbls[s] || ""}</span>
+  </div>`;
+      }
+
+      function closeDP() {
+        document.getElementById("dp").classList.remove("show");
+        document.getElementById("close-dp-btn").style.display = "none";
+        selId = null;
+        document.querySelectorAll(".tl-row").forEach((r) => {
+          r.classList.remove("sel");
+          const c = r.querySelector(".tl-card");
+          if (c) c.style.borderColor = "";
+        });
+      }
+
+      // ═══════════════════════════════════════════════
+      //  FILTERS
+      // ═══════════════════════════════════════════════
+      function setFilter(f) {
+        activeFilter = f;
+        renderFilters();
+        renderTimeline();
+        closeDP();
+      }
+
+      // ═══════════════════════════════════════════════
+      //  MODAL
+      // ═══════════════════════════════════════════════
+      function openModal() {
+        document.getElementById("import-ta").value = "";
+        document.getElementById("mbg").classList.add("show");
+      }
+      function closeModal() {
+        document.getElementById("mbg").classList.remove("show");
+      }
+      function closeModalBg(e) {
+        if (e.target === document.getElementById("mbg")) closeModal();
+      }
+      function doImport() {
+        try {
+          const raw = document.getElementById("import-ta").value.trim();
+          if (!raw) {
+            closeModal();
+            return;
+          }
+          DATA = JSON.parse(raw);
+          closeModal();
+          selId = null;
+          activeFilter = "all";
+          renderAll();
+        } catch (e) {
+          alert("JSON invalid:\n" + e.message);
+        }
+      }
+      function showExport() {
+        document.getElementById("import-ta").value = JSON.stringify(
+          DATA,
+          null,
+          2,
+        );
+        document.getElementById("mbg").classList.add("show");
+      }
+
+      // ═══════════════════════════════════════════════
+      //  GITHUB AUTO-FETCH
+      // ═══════════════════════════════════════════════
+      function openGithubModal() {
+        document.getElementById("gh-url").value =
+          localStorage.getItem("gh_url") || "";
+        document.getElementById("gh-folder").value =
+          localStorage.getItem("gh_folder") || "docs/pushes";
+        document.getElementById("gh-branch").value =
+          localStorage.getItem("gh_branch") || "main";
+        document.getElementById("gh-progress").style.display = "none";
+        document.getElementById("gh-progress").innerHTML = "";
+        document.getElementById("ghbg").classList.add("show");
+      }
+      function closeGhModal() {
+        document.getElementById("ghbg").classList.remove("show");
+      }
+      function closeGhModalBg(e) {
+        if (e.target === document.getElementById("ghbg")) closeGhModal();
+      }
+
+      function showFetchStatus(msg, color = "var(--t2)") {
+        const el = document.getElementById("fetch-status");
+        el.style.display = "block";
+        el.style.color = color;
+        el.textContent = msg;
+        setTimeout(() => {
+          el.style.display = "none";
+        }, 4000);
+      }
+
+      function logProgress(msg) {
+        const p = document.getElementById("gh-progress");
+        p.style.display = "block";
+        p.innerHTML += msg + "<br>";
+        p.scrollTop = p.scrollHeight;
+      }
+
+      function extractMetadataFromMarkdown(content) {
+        // Extrage blocul METADATA_JSON din Blueprint 02
+        const match = content.match(/<!--\s*METADATA_JSON\s*([\s\S]*?)\s*-->/);
+        if (match === null) return null;
+        try {
+          return JSON.parse(match[1].trim());
+        } catch (e) {
+          return null;
+        }
+      }
+
+      function normalizeScope(scope) {
+        const normalized = String(scope || "")
+          .trim()
+          .toLowerCase();
+        if (["frontend", "backend", "fullstack"].includes(normalized))
+          return normalized;
+        return "";
+      }
+
+      function inferScopeFromText(text) {
+        const lower = String(text || "").toLowerCase();
+        if (/(front|ui|dashboard)/.test(lower)) return "frontend";
+        if (/(back|analyzer|benchmark|engine)/.test(lower)) return "backend";
+        return "fullstack";
+      }
+
+      function blueprintToEvent(meta, filename) {
+        if (!meta || !meta.blueprint_type) return null;
+        const type = meta.blueprint_type;
+
+        if (type === "push") {
+          const scope =
+            normalizeScope(meta.scope || meta.tag || meta.track) ||
+            inferScopeFromText(meta.commit_title || meta.title || meta.task_id);
+          const pushTitle =
+            meta.commit_title || meta.title || meta.task_id || filename;
+          const pushSummary =
+            meta.summary ||
+            `Push ${meta.repo || ""} de către ${meta.author || "—"}`;
+
+          return {
+            id:
+              meta.event_id ||
+              meta.task_id ||
+              filename.replace(".md", "").replace(/[^a-z0-9]/gi, "_"),
+            type: "push",
+            repo: scope || "fullstack",
+            repo_source: meta.repo || "",
+            repo_display: meta.repo || "—",
+            date: meta.push_time
+              ? meta.push_time.slice(0, 10)
+              : filename.slice(0, 10),
+            version: meta.version_to || "0.0.0",
+            author: meta.author || "—",
+            title: pushTitle,
+            summary: pushSummary,
+            hours: meta.hours_worked || 0,
+            difficulty: meta.difficulty || 0,
+            added: meta.files_added || [],
+            modified: meta.files_modified || [],
+            deleted: meta.files_deleted || [],
+            bugs_fixed: meta.bugs_fixed || [],
+            bugs_known: meta.bugs_known || [],
+            breaking_changes: meta.breaking_changes || false,
+            breaking_detail: meta.breaking_detail || "",
+          };
+        }
+        if (type === "kickoff") {
+          const kickoffTeam = Array.isArray(meta.team)
+            ? meta.team
+            : meta.team_size
+              ? [`Echipă: ${meta.team_size} membri`]
+              : [];
+
+          return {
+            id: "kickoff",
+            type: "kickoff",
+            date: meta.start_date || filename.slice(0, 10),
+            version: meta.version || "0.1.0",
+            title: `Kickoff — ${meta.project_name || "Proiect"}`,
+            summary: `Proiect ${meta.project_name || ""} inițializat. Stack: ${(meta.stack || []).join(", ") || "—"}`,
+            details: {
+              team: kickoffTeam,
+              stack: meta.stack || [],
+              mvp_features: meta.mvp_features || [],
+              out_of_scope: meta.out_of_scope || [],
+              mvp_deadline: meta.mvp_deadline || "—",
+              investment: meta.investment || "—",
+              monetization: meta.monetization || "—",
+              estimated_revenue: meta.estimated_revenue || "—",
+            },
+          };
+        }
+        if (type === "mvp_launch") {
+          return {
+            id: "mvp",
+            type: "mvp",
+            date: meta.launch_date || filename.slice(0, 10),
+            version: meta.version || "1.0.0",
+            title: "MVP Launch",
+            summary: `${meta.project_name || "Proiect"} lansat. ${meta.features_delivered || 0}/${meta.features_planned || 0} funcții livrate.`,
+            details: {
+              published: meta.platforms || [],
+              features_delivered: meta.features_delivered || 0,
+              features_planned: meta.features_planned || 0,
+              total_hours: meta.total_hours || 0,
+              total_pushes: meta.total_pushes || 0,
+              bugs_at_launch: meta.bugs_at_launch || 0,
+              satisfaction: `${meta.satisfaction_score || 0}/5`,
+              store_links: {},
+              ops_links: {},
+              next: "—",
+              lessons: [],
+            },
+          };
+        }
+        return null;
+      }
+
+      async function doGithubFetch() {
+        const rawUrl = document.getElementById("gh-url").value.trim();
+        const folder = (
+          document.getElementById("gh-folder").value.trim() || "docs/pushes"
+        ).replace(/^\/|\/$/g, "");
+        const token = document.getElementById("gh-token").value.trim();
+        const branch =
+          document.getElementById("gh-branch").value.trim() || "main";
+
+        if (!rawUrl) {
+          alert("Introdu URL-ul GitHub!");
+          return;
+        }
+
+        // Parse owner/repo din URL
+        const m = rawUrl.match(/github\.com\/([^/]+)\/([^/]+)/);
+        if (!m) {
+          alert("URL invalid. Format: https://github.com/username/repo");
+          return;
+        }
+        const [, owner, repo] = m;
+
+        localStorage.setItem("gh_url", rawUrl);
+        localStorage.setItem("gh_folder", folder);
+        localStorage.setItem("gh_branch", branch);
+
+        const btn = document.getElementById("gh-fetch-btn");
+        btn.disabled = true;
+        btn.textContent = "⏳ Se încarcă...";
+        document.getElementById("gh-progress").innerHTML = "";
+        logProgress(`🔗 Conectare la GitHub: ${owner}/${repo}`);
+        logProgress(`📁 Folder: ${folder} | Branch: ${branch}`);
+
+        const headers = token ? { Authorization: `token ${token}` } : {};
+        const apiBase = `https://api.github.com/repos/${owner}/${repo}`;
+
+        try {
+          // 1. Fetch lista de fișiere din folder
+          logProgress(`📋 Citesc lista de fișiere...`);
+          const listRes = await fetch(
+            `${apiBase}/contents/${folder}?ref=${branch}`,
+            { headers },
+          );
+          if (!listRes.ok) {
+            const err = await listRes.json();
+            throw new Error(`GitHub API: ${err.message}`);
+          }
+          const files = await listRes.json();
+          const mdFiles = files.filter(
+            (f) => f.name.endsWith(".md") && f.type === "file",
+          );
+          logProgress(`✅ Găsite ${mdFiles.length} fișiere .md`);
+
+          // 2. Fetch conținut fiecare fișier
+          const events = [];
+          const reposFound = {};
+          let projectName = repo;
+          const scopeDisplay = {
+            frontend: { label: "Frontend", short: "FE", color: "#60a5fa" },
+            backend: { label: "Backend", short: "BE", color: "#34d399" },
+            fullstack: {
+              label: "Fullstack",
+              short: "FS",
+              color: "#fb923c",
+            },
+          };
+          const REPO_COLORS_LIST = [
+            "#60a5fa",
+            "#34d399",
+            "#fb923c",
+            "#f472b6",
+            "#a78bfa",
+            "#fbbf24",
+          ];
+          let colorIdx = 0;
+
+          for (const file of mdFiles) {
+            logProgress(`  📄 Citesc ${file.name}...`);
+            const contentRes = await fetch(file.download_url, { headers });
+            if (!contentRes.ok) {
+              logProgress(`  ⚠️ Nu am putut citi ${file.name}`);
+              continue;
+            }
+            const content = await contentRes.text();
+            const meta = extractMetadataFromMarkdown(content);
+            if (!meta) {
+              logProgress(`  ⚠️ METADATA_JSON lipsă în ${file.name}`);
+              continue;
+            }
+
+            if (meta.project_name) projectName = meta.project_name;
+
+            const event = blueprintToEvent(meta, file.name);
+            if (event) {
+              events.push(event);
+              if (event.repo && !reposFound[event.repo]) {
+                if (scopeDisplay[event.repo]) {
+                  reposFound[event.repo] = scopeDisplay[event.repo];
+                } else {
+                  const c = REPO_COLORS_LIST[colorIdx % REPO_COLORS_LIST.length];
+                  reposFound[event.repo] = {
+                    color: c,
+                    label: event.repo
+                      .split("-")
+                      .map((w) => w[0].toUpperCase() + w.slice(1))
+                      .join(" "),
+                    short: event.repo.slice(0, 2).toUpperCase(),
+                  };
+                  colorIdx++;
+                }
+              }
+              logProgress(
+                `  ✅ ${file.name} → event ${event.type} v${event.version || "?"}`,
+              );
+            }
+          }
+
+          // 3. Sortează events după dată
+          events.sort((a, b) => a.date.localeCompare(b.date));
+
+          // 4. Construiește DATA
+          const fetchedData = {
+            project: projectName,
+            description: `Auto-fetched din github.com/${owner}/${repo}`,
+            repos: Object.keys(reposFound).length
+              ? reposFound
+              : {
+                  [repo]: {
+                    color: "#60a5fa",
+                    label: repo,
+                    short: repo.slice(0, 2).toUpperCase(),
+                  },
+                },
+            events: events,
+          };
+
+          logProgress(`\n🎉 Done! ${events.length} events încărcate.`);
+          showFetchStatus(
+            `✅ ${events.length} events încărcate din GitHub`,
+            "#34d399",
+          );
+
+          setTimeout(() => {
+            DATA = fetchedData;
+            selId = null;
+            activeFilter = "all";
+            renderAll();
+            closeGhModal();
+          }, 1200);
+        } catch (e) {
+          logProgress(`❌ Eroare: ${e.message}`);
+          showFetchStatus(`❌ ${e.message}`, "#f87171");
+        } finally {
+          btn.disabled = false;
+          btn.textContent = "🔗 Fetch din GitHub";
+        }
+      }
+
+      // ═══════════════════════════════════════════════
+      //  INIT
+      // ═══════════════════════════════════════════════
+      function renderAll() {
+        document.getElementById("hdr-proj").textContent = DATA.project || "—";
+        document.getElementById("hdr-desc").textContent =
+          DATA.description || "—";
+        renderStats();
+        renderLegend();
+        renderFilters();
+        renderTimeline();
+      }
+      renderAll();
+    </script>
+  </body>
+</html>
