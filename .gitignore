@@ -1,1 +1,22 @@
-node_modules
+node_modules/
+build/
+dist/
+coverage/
+
+__pycache__/
+*.pyc
+*.pyo
+
+package-lock.json
+
+# Local benchmark corpus (manual pull-in, never committed)
+docs/benchmarks/Diagrams repo test/
+docs/benchmarks/diagrams repos test/
+
+# Env files (keep only templates in git)
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+!.env.example
